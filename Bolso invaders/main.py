@@ -6,7 +6,7 @@ from pygame import mixer
 
 # Intialize the pygame
 pygame.init()
-  
+
 # create the screen
 screen = pygame.display.set_mode((800, 600))
 
@@ -18,7 +18,7 @@ mixer.music.load("background.wav")
 mixer.music.play(-1)
 
 # Caption and Icon
-pygame.display.set_caption("Space Invader")
+pygame.display.set_caption("Bolso Invader")
 icon = pygame.image.load('ufo.png')
 pygame.display.set_icon(icon)
 
@@ -93,13 +93,11 @@ def fire_bullet(x, y):
 
 def isCollision(enemyX, enemyY, bulletX, bulletY):
     distance = math.sqrt(math.pow(enemyX - bulletX, 2) + (math.pow(enemyY - bulletY, 2)))
-    if distance < 27:
-        return True
-    else:
-        return False
+    return (distance < 27)
 
 
 # Game Loop
+bulletSound = mixer.Sound("laser.wav")
 running = True
 while running:
 
@@ -118,16 +116,14 @@ while running:
             if event.key == pygame.K_RIGHT:
                 playerX_change = 1
             if event.key == pygame.K_SPACE:
-                if bullet_state is "ready":
-                    bulletSound = mixer.Sound("laser.wav")
+                if bullet_state == "ready":
                     bulletSound.play()
                     # Get the current x cordinate of the spaceship
                     bulletX = playerX
                     fire_bullet(bulletX, bulletY)
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                playerX_change = 0
+        if event.type == pygame.KEYUP and event.key in (pygame.K_LEFT, pygame.K_RIGHT):
+            playerX_change = 0
 
     # 5 = 5 + -0.1 -> 5 = 5 - 0.1
     # 5 = 5 + 0.1
@@ -157,10 +153,9 @@ while running:
             enemyY[i] += enemyY_change[i]
 
         # Collision
-        collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
-        if collision:
-           # explosionSound = mixer.Sound("explosion.wav")
-           # explosionSound.play()
+        if isCollision(enemyX[i], enemyY[i], bulletX, bulletY):
+            # explosionSound = mixer.Sound("explosion.wav")
+            # explosionSound.play()
             bulletY = 480
             bullet_state = "ready"
             score_value += 1
@@ -174,7 +169,7 @@ while running:
         bulletY = 480
         bullet_state = "ready"
 
-    if bullet_state is "fire":
+    if bullet_state == "fire":
         fire_bullet(bulletX, bulletY)
         bulletY -= bulletY_change
 
